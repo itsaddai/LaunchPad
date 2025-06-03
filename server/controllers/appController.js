@@ -19,7 +19,7 @@ exports.createApplication = async (req, res) => {
   }
 };
 
-// Get all applications for a user
+// fetch all applications for a user
 exports.getApplications = async (req, res) => {
   try {
     const apps = await Application.find({ user: req.user.id });
@@ -29,7 +29,18 @@ exports.getApplications = async (req, res) => {
   }
 };
 
-// Update an application
+// get a single application by id
+exports.getApplicationById = async (req, res) => {
+  try {
+    const app = await Application.findOne({ _id: req.params.id, user: req.user.id });
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    res.status(200).json(app);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to get application' });
+  }
+};
+
+// update an application
 exports.updateApplication = async (req, res) => {
   try {
     const updated = await Application.findOneAndUpdate(

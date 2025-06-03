@@ -1,10 +1,11 @@
-// index.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const cors = require('cors');
-require('dotenv').config();
+const appRoutes = require('./routes/applications');
+
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 // routes
+app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
 
 // connect to MongoDB
@@ -27,7 +29,7 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(() => {
-  console.log(' MongoDB connected successfully ✅');
+  console.log('MongoDB connected successfully ✅');
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT} ✅ `);
   });

@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // register controller
@@ -27,6 +26,7 @@ exports.register = async (req, res) => {
 
     await newUser.save();
     console.log(" User created successfully!:", newUser);
+    
 
     // return token after registration
     
