@@ -1,19 +1,22 @@
 require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth');
 const cors = require('cors');
 const appRoutes = require('./routes/applications');
 
 
 const app = express();
-app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 // middleware
 
-dotenv.config();
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
+app.use(express.json());
 
 // test route
 app.get('/', (req, res) => {
