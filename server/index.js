@@ -5,11 +5,16 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const cors = require('cors');
 const appRoutes = require('./routes/applications');
-
+const { OpenAI } = require("openai");
+const authenticate = require("./middleware/auth");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+//openai config
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 // middleware
 
 app.use(cors({
@@ -25,6 +30,7 @@ app.get('/', (req, res) => {
 // routes
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
+app.use("api/resume", require('./routes/resume'));
 
 // connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {

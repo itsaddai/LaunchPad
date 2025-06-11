@@ -1,20 +1,19 @@
-import React from 'react';
-import LandingPage from "./pages/Landing";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { AuthProvider, useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
-import Navbar from "./pages/Navbar"
+import ResumeGenerator from "./pages/ResumeCreation";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Navbar from "./pages/Navbar"; // Make sure Navbar is in components or adjust the path accordingly
 
+// Protect routes that need authentication
 function PrivateRoute({ children }) {
   const { user, token } = useAuth();
 
-  // Optional: log for debugging
-  console.log("PrivateRoute check:", { user, token });
-
   if (!user || !token) {
-    return <h1>Access Denied: Please Login</h1>; // or <Navigate to="/login" replace />
+    return <h1>Access Denied: Please Login</h1>;
   }
 
   return children;
@@ -24,14 +23,19 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <Navbar />
         <Routes>
-           <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          {/*  Navbar */}
-          <Route path="/" element={<Navbar />} />
-
-          {/*  dashboard protected */}
+          <Route
+            path="/resume"
+            element={
+              <PrivateRoute>
+                <ResumeGenerator />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

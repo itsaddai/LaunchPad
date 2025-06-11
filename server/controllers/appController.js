@@ -63,3 +63,13 @@ exports.deleteApplication = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete application' });
   }
 };
+
+//delete all applications for a user
+exports.deleteAllApplications = async (req, res) => {
+  try {
+    await Application.deleteMany({ user: req.user.id });
+    res.status(200).json({ message: 'All applications deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete all applications' });
+  }
+};
