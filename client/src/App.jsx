@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ResumeGenerator from "./pages/ResumeCreation";
+import Profile from "./pages/Profile";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./pages/Navbar"; // Make sure Navbar is in components or adjust the path accordingly
 
@@ -29,13 +30,21 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
-            path="/resume"
+            path="/generate"
             element={
               <PrivateRoute>
                 <ResumeGenerator />
               </PrivateRoute>
             }
           />
+          <Route
+  path="/profile"
+  element={
+    <PrivateRoute>
+      <Profile />
+    </PrivateRoute>
+  }
+/>
           <Route
             path="/dashboard"
             element={

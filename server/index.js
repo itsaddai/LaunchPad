@@ -7,6 +7,7 @@ const cors = require('cors');
 const appRoutes = require('./routes/applications');
 const { OpenAI } = require("openai");
 const authenticate = require("./middleware/auth");
+const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
 app.use("api/resume", require('./routes/resume'));
+app.use('/api/profile', profileRoutes);
 
 // connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
