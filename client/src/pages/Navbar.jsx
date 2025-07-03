@@ -14,8 +14,8 @@ const Navbar = () => {
       <div className="flex space-x-4 items-center">
         {isAuthenticated ? (
           <>
-            <Link to="/dashboard" className="text-gray-700 hover:underline">
-              Dashboard
+            <Link to="/applications" className="text-gray-700 hover:underline">
+              Applications
             </Link>
             <Link to="/generate" className="text-gray-700 hover:underline">
               Resume Builder

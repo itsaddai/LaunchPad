@@ -8,6 +8,7 @@ const appRoutes = require('./routes/applications');
 const { OpenAI } = require("openai");
 const authenticate = require("./middleware/auth");
 const profileRoutes = require('./routes/profile');
+const resumeRoutes = require('./routes/resume');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,16 +29,16 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
+
 // routes
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
-app.use("api/resume", require('./routes/resume'));
+app.use("/api/resume", resumeRoutes);
 app.use('/api/profile', profileRoutes);
-
+const listEndpoints = require('express-list-endpoints');   // ← CommonJS
+console.table(listEndpoints(app));
 // connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
 })
 .then(() => {
   console.log('MongoDB connected successfully ✅');

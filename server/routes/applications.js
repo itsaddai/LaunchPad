@@ -14,4 +14,7 @@ router.put('/:id', appController.updateApplication);
 router.delete('/:id', appController.deleteApplication);
 router.delete('/', appController.deleteAllApplications);
 
+// route for sankeymatic stats
+
+
 module.exports = router;

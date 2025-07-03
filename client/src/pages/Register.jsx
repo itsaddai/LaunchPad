@@ -33,7 +33,7 @@ const Register = () => {
       }
       const data = await res.json();
       login(data.token, data.user)
-      navigate("/dashboard");
+      navigate("/applications");
     } catch (err) {
       setError(err.message || "Something went wrong");
     }

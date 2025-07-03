@@ -34,7 +34,7 @@ const Login = () => {
       login(data.token, data.user);
 
       // Redirect to dashboard
-      navigate("/dashboard");
+      navigate("/");
     } catch (err) {
       setError("Something went wrong. Try again.");
       console.error("Login error:", err);

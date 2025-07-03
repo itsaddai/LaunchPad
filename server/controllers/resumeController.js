@@ -1,34 +1,62 @@
+const { OpenAIApi } = require("openai");
+const Profile = require("../models/Profile");
 const OpenAI = require('openai');
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-exports.generateResume = async (req, res) => {
-  const { jobDescription, userExperiences } = req.body;
 
-  if (!jobDescription || !userExperiences) {
-    return res.status(400).json({ error: 'Missing fields' });
-  }
+exports.generateResume = async (req, res) => {
+  const userId = req.user.id;
+  const { jobDescription } = req.body;
 
   try {
-    const prompt = `
-You are a professional resume writer. Given the job description and experiences below, generate a tailored professional resume summary and experience section.
+    const profile = await Profile.findOne({ user: userId });
+    if (!profile) return res.status(404).json({ message: "Profile not found" });
+
+    const prompt = `You're a resume/career expert. Based on the given profile and job description, generate tailored resume bullet points for each work experience and project.
 
 Job Description:
 ${jobDescription}
-User Experiences:
-${userExperiences.map((exp, i) => `(${i + 1}) ${exp.title} at ${exp.company} - ${exp.description}`).join('\n')}
-Output in professional resume format.
-`;
 
-    const chatResponse = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
+User Profile:
+Full Name: ${profile.fullName}
+Title: ${profile.title}
+Summary: ${profile.summary}
+Skills: ${profile.skills}
+Education: ${profile.education}
+Experience: ${JSON.stringify(profile.experience, null, 2)}
+Projects: ${JSON.stringify(profile.projects, null, 2)}
+
+Output a JSON object of bullet points under each experience/project.`;
+
+    const response = await openai.responses.create({
+      model: "gpt-4.1-nano-2025-04-14",
+      input: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
 
-    const resume = chatResponse.choices[0].message.content;
-    res.json({ resume });
+    try {
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo", // or whatever you're using
+    messages: [
+      { role: "system", content: "You are a resume generator..." },
+      { role: "user", content: prompt }
+    ]
+  });
+
+  if (response && response.choices && response.choices.length > 0) {
+    const resume = response.choices[0].message.content;
+    res.status(200).json({ resume });
+  } else {
+    res.status(500).json({ error: "No valid response from AI" });
+  }
+} catch (error) {
+  console.error("OpenAI Error:", error);
+  res.status(500).json({ error: error.message || "Unexpected error" });
+}
+
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to generate resume' });
+    res.status(500).json({ message: "Failed to generate resume" });
   }
 };
