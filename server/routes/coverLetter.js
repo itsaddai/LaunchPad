@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const resumeController = require('../controllers/resumeController');
+const coverLetter = require('../controllers/coverletterController');
 const authenticate = require('../middleware/auth');
 
-router.post('/generate', authenticate, resumeController.generateResume);
+router.post('/', authenticate, coverLetter.generateCoverLetter);
 
 module.exports = router;

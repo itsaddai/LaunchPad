@@ -1,1 +1,1 @@
-router.post("/generate", authenticateUser, generateResume);
+router.post("/generate", authenticateUser, coverLetterController.generateCoverLetter);

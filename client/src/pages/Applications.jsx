@@ -119,7 +119,7 @@ const Dashboard = () => {
                 )}
                  <button
       onClick={handleDeleteAll}
-      className="fixed top-6 right-6 z-50 text-sm text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-50 shadow-sm transition"
+      className="fixed bottom-6 left-6 z-50 text-sm text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-50 shadow-sm transition"
     >
       Delete All
     </button>

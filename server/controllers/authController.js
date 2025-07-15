@@ -2,13 +2,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const JWT_SECRET = process.env.JWT_SECRET;
+const crypto = require("crypto");
 
 // register controller
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { fullName, email, password, confirmPassword } = req.body;
 
-    console.log("📥 Received data:", { name, email });
+    console.log("📥 Received data:", { fullName, email });
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -19,7 +20,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      name,
+      fullName,
       email,
       password: hashedPassword
     });
@@ -56,7 +57,7 @@ exports.login = async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
-    res.status(200).json({ token, user: { id: user._id, name: user.name, email } });
+    res.status(200).json({ token, user: { id: user._id, fullName: user.fullName, email } });
   } catch (err) {
     res.status(500).json({ message: 'Login failed' });
   }

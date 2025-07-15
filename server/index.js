@@ -8,7 +8,8 @@ const appRoutes = require('./routes/applications');
 const { OpenAI } = require("openai");
 const authenticate = require("./middleware/auth");
 const profileRoutes = require('./routes/profile');
-const resumeRoutes = require('./routes/resume');
+const coverLetterRoutes = require('./routes/coverLetter');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,10 +34,9 @@ app.get('/', (req, res) => {
 // routes
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
-app.use("/api/resume", resumeRoutes);
+app.use("/api/generate", coverLetterRoutes);
 app.use('/api/profile', profileRoutes);
-const listEndpoints = require('express-list-endpoints');   // ← CommonJS
-console.table(listEndpoints(app));
+
 // connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
 })

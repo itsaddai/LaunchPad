@@ -17,6 +17,9 @@ exports.createApplication = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to create application', error: error.message });
   }
+  if (!company && !position && !status && !notes) {
+    return res.status(400).json({ message: 'Company, position, status, and notes are required' });
+  }
 };
 
 // fetch all applications for a user

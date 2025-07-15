@@ -1,21 +1,33 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; 
- 
- 
+import { useAuth } from "../context/AuthContext";
+
 const Register = () => {
-  
   const { login } = useAuth();
   const navigate = useNavigate();
-  
-  const [name, setName] = useState("");
+
+  const [fullName, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset error
+    setError("");
+
+    // ✅ Password must be 8+ chars, 1 uppercase, 1 number
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters long and include one uppercase letter and one number.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
     try {
       const res = await fetch("http://localhost:5000/api/auth/register", {
@@ -23,19 +35,23 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+       body: JSON.stringify({ fullName, email, password, confirmPassword }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.message || "Registration failed");
-        return;
-      }
       const data = await res.json();
-      login(data.token, data.user)
-      navigate("/applications");
+
+      if (!res.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+
+      // Success: account created but not logged in
+      alert("Account created. Please check your email to verify your account.");
+      navigate("/verify-email");
+
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,7 +64,7 @@ const Register = () => {
           type="text"
           placeholder="Name"
           className="w-full p-2 border rounded"
-          value={name}
+          value={fullName}
           onChange={(e) => setName(e.target.value)}
         />
         <input
@@ -58,13 +74,37 @@ const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+
+        <div>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="w-full p-2 border rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            className="w-full p-2 border rounded mt-2"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            ></input>
+          
+          <p className="text-xs text-gray-500 mt-1">
+            Must be 8+ characters, include 1 uppercase letter and 1 number.
+          </p>
+          <label className="text-sm flex items-center gap-2 mt-1">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            />
+            Show password
+          </label>
+        </div>
+
+
         <button type="submit" className="w-full bg-black text-white py-2 rounded">
           Register
         </button>

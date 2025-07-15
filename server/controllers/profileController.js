@@ -1,28 +1,43 @@
-// controllers/profileController.js
 const Profile = require("../models/Profile");
 
 const getProfile = async (req, res) => {
-  const profile = await Profile.findOne({ user: req.user.id });
-  res.json(profile);
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+    if (!profile) {
+      return res.status(404).json({ message: "No profile found for this user" });
+    }
+    res.json({ profile });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 const saveProfile = async (req, res) => {
-  const { fullName, title, summary, skills, education, experience, projects } = req.body;
-  const profileFields = { user: req.user.id, fullName, title, summary, skills, education, experience, projects };
+  const { fullName, email, phoneNumber, linkedin } = req.body;
 
-  let profile = await Profile.findOne({ user: req.user.id });
-  if (profile) {
-    profile = await Profile.findOneAndUpdate(
-      { user: req.user.id },
-      { $set: profileFields },
-      { new: true }
-    );
-    return res.json(profile);
+  const profileFields = { user: req.user.id, fullName, email, phoneNumber, linkedin };
+
+  try {
+    let profile = await Profile.findOne({ user: req.user.id });
+    if (profile) {
+      // update existing profile
+      profile = await Profile.findOneAndUpdate(
+        { user: req.user.id },
+        { $set: profileFields },
+        { new: true }
+      );
+      return res.json(profile);
+    }
+
+    // create new profile
+    profile = new Profile(profileFields);
+    await profile.save();
+    res.json(profile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
-
-  profile = new Profile(profileFields);
-  await profile.save();
-  res.json(profile);
 };
 
 module.exports = { getProfile, saveProfile };
