@@ -17,7 +17,7 @@ const Profile = () => {
       }
 
       try {
-        const res = await fetch('https://launchpad-backend.onrender.com/api/profile/', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -66,7 +66,7 @@ const Profile = () => {
     }
 
     try {
-      const res = await fetch('https://launchpad-backend.onrender.com/api/profile', {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ const LandingPage = () => {
     const fetchApps = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://launchpad-backend.onrender.com/api/applications/", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
           method: "GET",
           credentials: "include",
           headers: { Authorization: `Bearer ${token}` },

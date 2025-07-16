@@ -20,7 +20,7 @@ const Dashboard = () => {
   }, [token]);
 
   const handleDelete = async (id) => {
-    await fetch(`https://launchpad-backend.onrender.com/api/applications/${id}`, {
+    await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -39,7 +39,7 @@ const Dashboard = () => {
   if (!confirmDelete) return;
 
   try {
-    await fetch(`https://launchpad-backend.onrender.com/api/applications/`, {
+    await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const Dashboard = () => {
   const handleDuplicate = async (app) => {
     const copy = { ...app };
     delete copy._id;
-    const res = await fetch("https://launchpad-backend.onrender.com/api/applications/", {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -255,8 +255,8 @@ const Dashboard = () => {
           onClick={async () => {
             const method = formData._id ? "PUT" : "POST";
             const url = formData._id
-              ? `https://launchpad-backend.onrender.com/api/applications/${formData._id}`
-              : "https://launchpad-backend.onrender.com/api/applications";
+              ? `${import.meta.env.VITE_API_BASE_URL}/api/applications/${formData._id}`
+              : "${import.meta.env.VITE_API_BASE_URL}/api/applications";
 
             const res = await fetch(url, {
               method,
