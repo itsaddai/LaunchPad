@@ -9,7 +9,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      const res = await fetch("http://localhost:5000/api/applications", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
+
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -19,7 +20,7 @@ const Dashboard = () => {
   }, [token]);
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:5000/api/applications/${id}`, {
+    await fetch(`https://launchpad-backend.onrender.com/api/applications/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -38,7 +39,7 @@ const Dashboard = () => {
   if (!confirmDelete) return;
 
   try {
-    await fetch('http://localhost:5000/api/applications', {
+    await fetch(`https://launchpad-backend.onrender.com/api/applications/`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -56,7 +57,7 @@ const Dashboard = () => {
   const handleDuplicate = async (app) => {
     const copy = { ...app };
     delete copy._id;
-    const res = await fetch("http://localhost:5000/api/applications", {
+    const res = await fetch("https://launchpad-backend.onrender.com/api/applications/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -254,8 +255,8 @@ const Dashboard = () => {
           onClick={async () => {
             const method = formData._id ? "PUT" : "POST";
             const url = formData._id
-              ? `http://localhost:5000/api/applications/${formData._id}`
-              : "http://localhost:5000/api/applications";
+              ? `https://launchpad-backend.onrender.com/api/applications/${formData._id}`
+              : "https://launchpad-backend.onrender.com/api/applications";
 
             const res = await fetch(url, {
               method,

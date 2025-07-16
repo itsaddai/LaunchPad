@@ -17,7 +17,7 @@ const Profile = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:5000/api/profile', {
+        const res = await fetch('https://launchpad-backend.onrender.com/api/profile/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -66,7 +66,7 @@ const Profile = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/profile', {
+      const res = await fetch('https://launchpad-backend.onrender.com/api/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
