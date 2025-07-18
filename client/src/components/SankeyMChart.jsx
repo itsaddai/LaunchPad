@@ -187,7 +187,7 @@ const Dashboard = () => {
       return;
     }
 
-    fetch("http://localhost:5000/api/applications", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
