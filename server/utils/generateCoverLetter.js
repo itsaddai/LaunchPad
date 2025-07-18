@@ -4,8 +4,6 @@ import OpenAI from "openai";
 const router = express.Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-
-
 router.post("/", async (req, res) => {
   // validate given info
   const parse = schema.safeParse(req.body);
