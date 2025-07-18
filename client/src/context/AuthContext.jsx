@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
-// Create context
 const AuthContext = createContext();
 
+
 export const AuthProvider = ({ children }) => {
+
+  
   const [user, setUser] = useState(null); // Decoded user info
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-
-  // Decode token on initial load
+  
   useEffect(() => {
     if (token) {
       try {
@@ -16,11 +17,11 @@ export const AuthProvider = ({ children }) => {
         setUser(decoded);
       } catch (decodeError) {
         console.error("Invalid token on load:", decodeError);
-        logout(); // Clear out corrupted or expired token
+        logout();
       }
     }
   }, [token]);
-
+  
   const login = (token) => {
     try {
       const decoded = jwtDecode(token);
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
   };
-
+  
   const isAuthenticated = !!user && !!token;
 
   return (

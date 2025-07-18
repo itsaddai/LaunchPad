@@ -1,89 +1,173 @@
-// ============================================================================
-// SankeyMChart.jsx  –  Applications ➜ Status Sankey (single root node)
-// Requires: npm i recharts
-// ============================================================================
+import React, { useEffect, useState } from "react";
+import { ResponsiveContainer, Sankey, Tooltip, Label } from "recharts";
 
-import React, { useMemo } from 'react';
-import { ResponsiveContainer, Sankey, Tooltip } from 'recharts';
-
-/* ── 1. Build one root node (“Applications”) ➜ status nodes ─────────────── */
-const buildSankeyData = (apps = []) => {
-  // Root node index = 0
-  const nodes = [{ name: 'Applications' }];
-  const idxMap = new Map([['Applications', 0]]);   // status → index
-  const linkAgg = new Map();                       // status → count
-
-  apps.forEach(({ status = 'Unknown' }) => {
-    linkAgg.set(status, (linkAgg.get(status) || 0) + 1);
-  });
-
-  const links = [];
-  linkAgg.forEach((value, status) => {
-    // create node for each status if not exists
-    if (!idxMap.has(status)) {
-      idxMap.set(status, nodes.push({ name: status }) - 1);
-    }
-    links.push({
-      source: 0,                   // Applications
-      target: idxMap.get(status),  // Status node
-      value,                       // # of apps
-    });
-  });
-
-  return { nodes, links };
+// status colors 
+const STATUS_COLORS = {
+  Rejected: "#e74c3c",      // red
+  Ghosted: "#7f8c8d",       // grey
+  Interviewing: "#27ae60",  // green
+  "Offer Received": "#2980b9", // blue
+  "Unknown Status": "#bdc3c7", // light grey something..
 };
 
-/* ── 2. Simple coloured node component ─────────────────────────── */
-const Node = ({ x, y, width, height, index, payload }) => (
-  <g>
-    <rect
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={index === 0 ? '#60a5fa' : '#34d399'}
-      stroke="#ffffff"
-    />
-    <text
-      x={x + width / 2}
-      y={y + height / 2}
-      dy="0.35em"
-      textAnchor="middle"
-      fill="#ffffff"
-      fontSize={12}
-      pointerEvents="none"
-    >
-      {payload.name}
-    </text>
-  </g>
-);
+const buildSankeyData = (applications) => {
+  if (!applications || applications.length === 0) return null;
 
-/* ── 3. Chart component ────────────────────────────────────────── */
-const SankeyMChart = ({ applications }) => {
-  const data = useMemo(
-    () => buildSankeyData(applications),
-    [applications]
+  const nodes = [{ name: "Applications" }];
+
+
+  const statuses = Array.from(
+    new Set(applications.map((app) => app.status || "Unknown Status"))
   );
 
-  if (!data.nodes.length) {
-    return <p className="text-gray-500">No application data to display.</p>;
+  // statuses as right nodes
+  statuses.forEach((status) => nodes.push({ name: status }));
+
+  const nameToIndex = {};
+  nodes.forEach((node, i) => {
+    nameToIndex[node.name] = i;
+  });
+
+  // count applications for each status
+  const statusCounts = {};
+  applications.forEach((app) => {
+    const status = app.status || "Unknown Status";
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+
+  const links = statuses.map((status, idx) => ({
+    source: 0,
+    target: nameToIndex[status],
+    value: statusCounts[status],
+    key: `link-${idx}`,
+    color: STATUS_COLORS[status] || STATUS_COLORS["Unknown Status"],
+  }));
+
+  const nodesWithKeys = nodes.map((node, idx) => ({
+    ...node,
+    key: `node-${idx}`,
+  }));
+
+  return { nodes: nodesWithKeys, links };
+};
+
+const SankeyMChart = ({ applications }) => {
+  const data = buildSankeyData(applications);
+
+  if (!data) {
+    return (
+      <div className="text-center py-10 text-gray-600 italic">
+        No application data available to display the flow chart...
+        Get to applying! 
+      </div>
+    );
   }
 
+  const totalApps = applications.length;
+
   return (
-    <div className="w-full h-[420px] mb-10">
+    <div style={{ width: "100%", height: 400 }}>
       <ResponsiveContainer>
         <Sankey
           data={data}
-          node={<Node />}
-          nodePadding={40}
-          margin={{ top: 20, right: 120, bottom: 20, left: 120 }}
-          link={{ stroke: '#a3a3a3' }}
-          iterations={32}
+          nodePadding={30}
+          nodeWidth={20}
+          style={{ fontSize: 14 }}
+          nodes={data.nodes.map((node) => ({
+            ...node,
+            key: node.key,
+            fill: node.name === "Applications" ? "#34495e" : "#ccc",
+            stroke: "#555",
+          }))}
+          links={data.links.map((link) => ({
+            ...link,
+            key: link.key,
+            stroke: link.color,
+            fill: link.color,
+          }))}
         >
           <Tooltip
-            formatter={(v) =>
-              `${v} application${v > 1 ? 's' : ''}`
-            }
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const item = payload[0].payload;
+                if (!item) return null;
+
+                // Detect if hovering on node or link
+                if ("source" in item && "target" in item) {
+                  // Hovering on link
+                  const sourceName = data.nodes[item.source]?.name;
+                  const targetName = data.nodes[item.target]?.name;
+                  return (
+                    <div
+                      style={{
+                        backgroundColor: "white",
+                        padding: 8,
+                        border: "1px solid #ccc",
+                        borderRadius: 4,
+                        fontSize: 14,
+                        minWidth: 140,
+                      }}
+                    >
+                      <strong>
+                        {sourceName} → {targetName}
+                      </strong>
+                      <br />
+                      Applications: {item.value}
+                    </div>
+                  );
+
+                } else if ("name" in item) {
+                  if (item.name === "Applications") {
+                    return (
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          padding: 8,
+                          border: "1px solid #ccc",
+                          borderRadius: 4,
+                          fontSize: 14,
+                          minWidth: 140,
+                        }}
+                      >
+                        <strong>Total applications</strong>
+                        <br />
+                        {totalApps}
+                      </div>
+                    );
+                  } 
+                  else {
+                    const count =
+                      applications.filter(
+                        (app) => (app.status || "Unknown Status") === item.name
+                      ).length || 0;
+
+                    return (
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          padding: 8,
+                          border: "1px solid #ccc",
+                          borderRadius: 4,
+                          fontSize: 14,
+                          minWidth: 140,
+                        }}
+                      >
+                        <strong>{item.name}</strong>
+                        <br />
+                        Applications: {count}
+                      </div>
+                    );
+                  }
+                }
+              }
+              return null;
+            }}
+          />
+          <Label
+            value="Applications Flow: Total → Status"
+            position="top"
+            offset={10}
+            style={{ fontWeight: "bold" }}
           />
         </Sankey>
       </ResponsiveContainer>
@@ -91,4 +175,42 @@ const SankeyMChart = ({ applications }) => {
   );
 };
 
-export default SankeyMChart;
+const Dashboard = () => {
+  const [applications, setApplications] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.warn("No auth token found, cannot fetch applications");
+      setApplications([]);
+      return;
+    }
+
+    fetch("http://localhost:5000/api/applications", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch applications");
+        return res.json();
+      })
+      .then((data) => {
+        setApplications(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching applications:", err);
+        setApplications([]);
+      });
+  }, []);
+
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <SankeyMChart applications={applications} />
+    </div>
+  );
+};
+
+export default Dashboard;

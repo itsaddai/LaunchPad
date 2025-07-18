@@ -1,28 +1,36 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const findOrCreate = require("mongoose-findorcreate");
+// may need to change in future installments...
 
-const UserSchema = new mongoose.Schema({
-  fullName: {
+const userSchema = new mongoose.Schema({
+  googleId: {
     type: String,
-    required: true,
-    trim: true
+    unique: true,
+    sparse: true,
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
-    lowercase: true
+    required: false, 
   },
-  verified : {
-  type: Boolean,
-  default: false,
-},
-verificationToken: String,
+  fullName: {
+    type: String,
+    required: false,
+  },
   password: {
     type: String,
-    required: true
+    required: false,
   },
-}, { timestamps: true });
+  avatar: {
+    type: String,
+  },
+  provider: {
+    type: String,
+    default: "local",
+  }
+});
 
+userSchema.plugin(findOrCreate);
 
+const User = mongoose.model("User", userSchema);
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = User;

@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
+  const { user } = useAuth(); 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (user && user.email) {
+      setEmail(user.email);
+    }
+    
+  }, [user]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -24,13 +33,13 @@ const Profile = () => {
         });
 
         if (!res.ok) {
-          setMessage('Failed to load profile.');
+          setMessage('Failed to load profile... Add some information!');
           return;
         }
 
         const data = await res.json();
         
-        if (data && Object.keys(data).length !== 0) {  // check if profile data exists
+  if (data && Object.keys(data).length !== 0) { 
   setName(data.fullName || '');
   setEmail(data.email || '');
   setPhone(data.phoneNumber || '');
@@ -49,7 +58,6 @@ const Profile = () => {
   }, []);
 
   const handleSave = async () => {
-    // Basic validation example
     if (!name || !email || !phone) {
       setMessage('Please fill in all required fields: name, email, phone.');
       return;
@@ -117,6 +125,7 @@ const Profile = () => {
       <input
         type="email"
         value={email}
+        readOnly
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Your Email"
         className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-xl"

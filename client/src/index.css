@@ -118,3 +118,89 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  /* Base reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3 {
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--color-muted-foreground);
+    margin-bottom: 1rem;
+  }
+
+  /* Container to center and constrain width */
+  .container {
+    max-width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  /* Cards */
+  .card {
+    background-color: var(--color-card);
+    color: var(--color-card-foreground);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    margin-bottom: 2rem;
+  }
+
+  /* Buttons */
+  button {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s ease;
+  }
+  button:hover {
+    background-color: oklch(from-var(--color-primary) calc(l * 0.8) 0 0);
+  }
+
+  /* Inputs */
+  input, select, textarea {
+    background-color: var(--color-input);
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 0.3);
+  }
+
+  /* Links */
+  a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+}

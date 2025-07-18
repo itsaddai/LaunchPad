@@ -1,6 +1,6 @@
 const Application = require('../models/Application');
 
-// Create a new application
+// create a new application
 exports.createApplication = async (req, res) => {
   try {
     const { company, position, status, appliedDate, notes } = req.body;
@@ -22,7 +22,7 @@ exports.createApplication = async (req, res) => {
   }
 };
 
-// fetch all applications for a user
+// fetch all applications by a user
 exports.getApplications = async (req, res) => {
   try {
     const apps = await Application.find({ user: req.user.id });
@@ -32,7 +32,7 @@ exports.getApplications = async (req, res) => {
   }
 };
 
-// get a single application by id
+// fetch a single application by id
 exports.getApplicationById = async (req, res) => {
   try {
     const app = await Application.findOne({ _id: req.params.id, user: req.user.id });
@@ -43,7 +43,7 @@ exports.getApplicationById = async (req, res) => {
   }
 };
 
-// update an application
+// update/adjust/change application
 exports.updateApplication = async (req, res) => {
   try {
     const updated = await Application.findOneAndUpdate(
@@ -57,7 +57,7 @@ exports.updateApplication = async (req, res) => {
   }
 };
 
-// Delete an application
+// delete app
 exports.deleteApplication = async (req, res) => {
   try {
     await Application.findOneAndDelete({ _id: req.params.id, user: req.user.id });
@@ -67,7 +67,7 @@ exports.deleteApplication = async (req, res) => {
   }
 };
 
-//delete all applications for a user
+// delete all apps
 exports.deleteAllApplications = async (req, res) => {
   try {
     await Application.deleteMany({ user: req.user.id });

@@ -10,6 +10,8 @@ const authenticate = require("./middleware/auth");
 const profileRoutes = require('./routes/profile');
 const coverLetterRoutes = require('./routes/coverLetter');
 const rateLimit = require('express-rate-limit');
+const passport = require("passport");
+require("./config/passport");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // routes
+app.use(passport.initialize());
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/generate", coverLetterRoutes);

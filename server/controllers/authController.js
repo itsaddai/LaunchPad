@@ -28,14 +28,19 @@ exports.register = async (req, res) => {
     await newUser.save();
     console.log(" User created successfully!:", newUser);
     
-
     // return token after registration
+    const login = (token, userData) => {
+  setToken(token);
+  setUser(userData);
+  localStorage.setItem("token", token);
+  localStorage.setItem("user", JSON.stringify(userData));
+  };
     
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1d' });
 
     res.status(201).json({
       message: 'User created successfully',
-      user: { id: newUser._id, name: newUser.name, email: newUser.email },
+      user: { id: newUser._id, name: newUser.fullName, email: newUser.email },
       token
     });
 

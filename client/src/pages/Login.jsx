@@ -1,10 +1,47 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // adjust path as needed
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, token: authToken } = useAuth(); 
+
+ 
+  function parseJwt(token) {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    // if logged in, redirect to dashboard
+    if (authToken) {
+      navigate("/", { replace: true });
+      return;
+    }
+
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+
+    if (token) {
+      const user = parseJwt(token);
+      login(token, user);
+      navigate("/", { replace: true });
+    }
+  }, [location, authToken, login, navigate]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,9 +54,7 @@ const Login = () => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
@@ -30,15 +65,16 @@ const Login = () => {
         return;
       }
 
-      // Save token & user to context
       login(data.token, data.user);
-
-      // Redirect to dashboard
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (err) {
       setError("Something went wrong. Try again.");
       console.error("Login error:", err);
     }
+  };
+
+  const handleOAuthLogin = (provider) => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/${provider}`;
   };
 
   return (
@@ -52,6 +88,7 @@ const Login = () => {
           className="w-full p-2 border rounded"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
@@ -59,6 +96,7 @@ const Login = () => {
           className="w-full p-2 border rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit" className="w-full bg-black text-white py-2 rounded">
           Login
@@ -66,6 +104,24 @@ const Login = () => {
 
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </form>
+
+      <div className="mt-6 w-full max-w-sm space-y-2">
+        <button
+          onClick={() => handleOAuthLogin("google")}
+          className="w-full flex items-center justify-center gap-2 bg-white border py-2 rounded hover:bg-gray-100"
+        >
+          <FaGoogle className="text-red-500" />
+          Continue with Google
+        </button>
+
+        <button
+          onClick={() => handleOAuthLogin("github")}
+          className="w-full flex items-center justify-center gap-2 bg-white border py-2 rounded hover:bg-gray-100"
+        >
+          <FaGithub className="text-gray-800" />
+          Continue with GitHub
+        </button>
+      </div>
 
       <p className="mt-4 text-sm">
         Don't have an account?{" "}

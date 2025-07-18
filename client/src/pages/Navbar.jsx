@@ -1,7 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-// shadcn/ui components
+// shadcn-ui components
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,10 +16,10 @@ const Navbar = () => {
   return (
     
     <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
-      {/* Logo — link home */}
+      {/* Logo / home link */}
       <Link to="/" className="flex items-center gap-2">
         <img
-          src="/favicon-v2.ico"               /* file in /public */
+          src="/favicon-v2.ico"
           alt="LaunchPad"
           className="h-8 w-8 transition-transform duration-200 hover:scale-110"
         />
@@ -40,7 +40,7 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Center links */}
+      {/* middle links */}
       <div className="flex gap-6 items-center">
         {isAuthenticated && (
           <NavLink
@@ -54,9 +54,10 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Right side */}
+      {/* right side, profile dropdown/logout and Login/Register links */}
+
       {isAuthenticated ? (
-        /* Avatar dropdown */
+        /* profile dropdown */
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="h-8 w-8 cursor-pointer">
@@ -75,7 +76,7 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        /* Login / Register buttons */
+        /* login / register buttons */
         <div className="flex gap-4">
           <NavLink to="/login" className="text-gray-700 hover:underline">
             Login

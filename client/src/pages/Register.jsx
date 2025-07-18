@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
-  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [fullName, setName] = useState("");
@@ -12,13 +13,11 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // ✅ Password must be 8+ chars, 1 uppercase, 1 number
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
       setError("Password must be at least 8 characters long and include one uppercase letter and one number.");
@@ -35,7 +34,7 @@ const Register = () => {
         headers: {
           "Content-Type": "application/json",
         },
-       body: JSON.stringify({ fullName, email, password, confirmPassword }),
+        body: JSON.stringify({ fullName, email, password, confirmPassword }),
       });
 
       const data = await res.json();
@@ -44,19 +43,38 @@ const Register = () => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      // Success: account created but not logged in
-      alert("Account created. Please check your email to verify your account.");
-      navigate("/verify-email");
+      // Show success toast
+      toast.success("Account created successfully, please log in!");
+
+      // Optional: Redirect after a delay to let user see toast
+      setTimeout(() => {
+        navigate("/profile");
+      }, 2000);
 
     } catch (err) {
       setError(err.message);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const handleOAuth = (provider) => {
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/auth/${provider}`;
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      {/* ToastContainer renders the toasts */}
+      <ToastContainer 
+        position="top-center" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        newestOnTop={false} 
+        closeOnClick 
+        rtl={false} 
+        pauseOnFocusLoss 
+        draggable 
+        pauseOnHover 
+      />
+
       <h2 className="text-2xl font-semibold mb-6">Create Your LaunchPad Account</h2>
 
       <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
@@ -89,8 +107,7 @@ const Register = () => {
             className="w-full p-2 border rounded mt-2"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            ></input>
-          
+          />
           <p className="text-xs text-gray-500 mt-1">
             Must be 8+ characters, include 1 uppercase letter and 1 number.
           </p>
@@ -104,13 +121,33 @@ const Register = () => {
           </label>
         </div>
 
-
         <button type="submit" className="w-full bg-black text-white py-2 rounded">
           Register
         </button>
 
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </form>
+
+      <div className="w-full max-w-sm mt-4">
+        <div className="flex items-center my-4">
+          <div className="flex-grow h-px bg-gray-300" />
+          <span className="mx-2 text-sm text-gray-500">or continue with</span>
+          <div className="flex-grow h-px bg-gray-300" />
+        </div>
+
+        <button
+          onClick={() => handleOAuth("google")}
+          className="w-full bg-white border border-gray-300 text-black py-2 rounded mb-2 hover:bg-gray-100">
+          <FaGoogle className="inline mr-2 text-red-500" />
+          Continue with Google
+        </button>
+        <button
+          onClick={() => handleOAuth("github")}
+          className="w-full bg-white border border-gray-300 text-black py-2 rounded hover:bg-gray-100">
+          <FaGithub className="inline mr-2" />
+          Continue with GitHub
+        </button>
+      </div>
 
       <p className="mt-4 text-sm">
         Already have an account?{" "}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
+
 const Dashboard = () => {
   const { token } = useAuth();
   const [applications, setApplications] = useState([]);
@@ -8,6 +9,7 @@ const Dashboard = () => {
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
+    
     const fetchApplications = async () => {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/applications`, {
 
@@ -47,7 +49,7 @@ const Dashboard = () => {
       },
     });
 
-    setApplications([]); // Clear all from local state
+    setApplications([]);
   } catch (err) {
     console.error('Error deleting all applications:', err);
   }
@@ -89,7 +91,6 @@ const Dashboard = () => {
   return (
   <div className="min-h-screen bg-[#e5e5e5] px-6 py-10 font-mono text-gray-900">
     <div className="max-w-4xl mx-auto">
-      {/* Minimal Header Section */}
       <div className="mb-12 space-y-2">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
           Applications – {applications.length}
@@ -98,8 +99,6 @@ const Dashboard = () => {
           Last updated: {new Date().toLocaleDateString()}
         </p>
       </div>
-
-      {/* App List */}
       <div className="grid grid-cols-1 gap-4">
         {applications.map((app) => (
           <div
@@ -133,8 +132,6 @@ const Dashboard = () => {
                 >
                   {app.status}
                 </span>
-
-                {/* 3-dot menu */}
                 <div className="relative">
                   <button
                     onClick={() =>
@@ -180,9 +177,6 @@ const Dashboard = () => {
           </div>
         ))}
       </div>
-
-
-        {/* Floating + Button */}
         <button
           onClick={() => {
             setFormData({});
@@ -193,7 +187,6 @@ const Dashboard = () => {
           +
         </button>
 
-        {/* Placeholder for Form Modal */}
         {showForm && (
   <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
     <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
@@ -256,7 +249,7 @@ const Dashboard = () => {
             const method = formData._id ? "PUT" : "POST";
             const url = formData._id
               ? `${import.meta.env.VITE_API_BASE_URL}/api/applications/${formData._id}`
-              : "${import.meta.env.VITE_API_BASE_URL}/api/applications";
+              : `${import.meta.env.VITE_API_BASE_URL}/api/applications`;
 
             const res = await fetch(url, {
               method,
