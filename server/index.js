@@ -23,7 +23,7 @@ const openai = new OpenAI({
 // middleware
 
 app.use(cors({
-  origin: 'https://launch-pad-sandy.vercel.app/',
+  origin: process.env.CLIENT_URL,
   credentials: true,
 }));
 app.use(express.json());
