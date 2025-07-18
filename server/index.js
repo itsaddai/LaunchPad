@@ -34,6 +34,9 @@ app.get('/', (req, res) => {
 });
 
 // routes
+app.get('/api/auth/google', (req, res) => {
+  res.send('Google Auth Route Works!');
+});
 app.use(passport.initialize());
 app.use('/api/applications', appRoutes);
 app.use('/api/auth', authRoutes);
