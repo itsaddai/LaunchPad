@@ -4,7 +4,7 @@
 From tracking applications visually to generating tailored cover letters using AI, LaunchPad provides a strong, productivity-heavy experience for internship and job hunters!
 ---
 
-## 🔍 Features
+##  Features
 
 -  **Application Tracker**: Manage and organize job/internship applications in one place.
 -  **Sankey Diagram Visualization**: Interactive graph showing application outcomes (e.g. Accepted, Rejected, Interview).
@@ -20,12 +20,22 @@ From tracking applications visually to generating tailored cover letters using A
 **Frontend Technology:**
 - React (Vite)
 - Tailwind CSS
-- Recharts (Sankey Diagram)
+- Recharts (SankeyMATIC Diagram)
 - Axios
+- Deployed On Vercel
 
 **Backend Technology:**
 - Node.js
 - Express
 - MongoDB (via Mongoose)
 - OpenAI API (for AI cover letter generation)
+- Passport.js (Google & GitHub OAuth)
 - JWT (for auth)
+- Deployed on Render
+
+## To-Do list...
+
+- [ ]  Add Dark Mode support for the UI
+- [ ]  Fix GitHub OAuth authentication callback and error handling
+- [ ]  Implement a step-by-step guide for users on how to use the platform effectively
+- [ ]  Set up custom domains for both frontend and backend (`app.launchpad.com`, `api.launchpad.com`... who knows)
