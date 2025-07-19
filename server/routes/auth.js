@@ -11,8 +11,7 @@ router.post('/login', login);
 //google auth
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get(
-  "/google/callback",
+router.get("auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/login",
     session: false, 
