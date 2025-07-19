@@ -9,9 +9,11 @@ router.post('/register', register);
 router.post('/login', login);
 
 //google auth
+console.log('Google route loaded');
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get("auth/google/callback",
+router.get(
+  "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/login",
     session: false, 
