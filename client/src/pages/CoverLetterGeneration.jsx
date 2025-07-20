@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import html2pdf from "html2pdf.js";
+/* global html2pdf */
 
 const CoverletterGeneration = () => {
   const { token } = useAuth();
@@ -10,7 +10,7 @@ const CoverletterGeneration = () => {
   const [experience, setExperience] = useState("");
   const [loading, setLoading] = useState(false);
   const [coverLetterText, setCoverLetterText] = useState("");
-  const previewRef = useRef(null); // Ref for PDF content
+  const coverLetterRef = useRef(null);
 
   const handleGenerate = async () => {
     if (!position || !company || !experience) {
@@ -51,27 +51,44 @@ const CoverletterGeneration = () => {
     }
   };
 
-  const handleDownload = () => {
-    const element = previewRef.current;
-    if (!element) return;
+const handleDownload = async () => {
+  try {
+    const element = document.createElement("div");
+    element.style.display = "none";
+    element.style.color = "#000";
+    element.style.backgroundColor = "#fff";
+    element.style.fontFamily = "Arial, sans-serif";
+    element.style.padding = "20px";
+    element.innerHTML = coverLetterText.replace(/\n/g, "<br/>");
+    document.body.appendChild(element);
 
-    html2pdf()
-      .set({
-        margin: 1,
-        filename: "Cover_Letter.pdf",
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-        },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      })
-      .from(element)
-      .save()
-      .catch((error) => {
-        console.error("PDF download error:", error);
-      });
-  };
+    // Wrap in timeout to prevent UI lock
+    setTimeout(() => {
+      html2pdf()
+        .set({
+          margin: 1,
+          filename: "Cover_Letter.pdf",
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+          },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        })
+        .from(element)
+        .save()
+        .then(() => {
+          document.body.removeChild(element);
+        })
+        .catch((error) => {
+          console.error("PDF download error:", error);
+        });
+    }, 100); // slight delay lets React finish updating
+  } catch (error) {
+    console.error("Download failed:", error);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex items-start justify-center py-12 px-4">
@@ -119,33 +136,23 @@ const CoverletterGeneration = () => {
         </button>
 
         {coverLetterText && (
-          <div className="mt-10">
-            <h2 className="text-xl font-semibold mb-3">Edit Your Cover Letter</h2>
+  <div className="mt-10">
+    <h2 className="text-xl font-semibold mb-3">Edit Your Cover Letter</h2>
+    
+    {/* Wrap this in a ref container */}
+    <div ref={coverLetterRef} className="bg-white text-black p-6 rounded-xl border mb-4 whitespace-pre-line">
+      {coverLetterText}
+    </div>
 
-            <textarea
-              value={coverLetterText}
-              onChange={(e) => setCoverLetterText(e.target.value)}
-              rows={10}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6"
-            />
+    <button
+      onClick={handleDownload}
+      className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+    >
+      Download as PDF
+    </button>
+  </div>
+)}
 
-            <h2 className="text-lg font-semibold mb-2">Preview</h2>
-            <div
-              ref={previewRef}
-              className="bg-white text-black border border-gray-300 rounded-xl p-6 whitespace-pre-wrap font-serif leading-relaxed mb-6"
-              style={{ minHeight: "400px" }}
-            >
-              {coverLetterText}
-            </div>
-
-            <button
-              onClick={handleDownload}
-              className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition"
-            >
-              Download as PDF
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
