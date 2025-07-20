@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import html2pdf from "html2pdf.js";
 
 const CoverletterGeneration = () => {
   const { token } = useAuth();
@@ -11,7 +10,7 @@ const CoverletterGeneration = () => {
   const [experience, setExperience] = useState("");
   const [loading, setLoading] = useState(false);
   const [coverLetterText, setCoverLetterText] = useState("");
-  const previewRef = useRef(null);
+  const previewRef = useRef(null); // Ref for PDF content
 
   const handleGenerate = async () => {
     if (!position || !company || !experience) {
@@ -52,27 +51,26 @@ const CoverletterGeneration = () => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     const element = previewRef.current;
     if (!element) return;
 
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
+    html2pdf()
+      .set({
+        margin: 1,
+        filename: "Cover_Letter.pdf",
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+        },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      })
+      .from(element)
+      .save()
+      .catch((error) => {
+        console.error("PDF download error:", error);
       });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "pt", "letter");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("Cover_Letter.pdf");
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
   };
 
   return (
@@ -123,18 +121,23 @@ const CoverletterGeneration = () => {
         {coverLetterText && (
           <div className="mt-10">
             <h2 className="text-xl font-semibold mb-3">Edit Your Cover Letter</h2>
+
             <textarea
               value={coverLetterText}
               onChange={(e) => setCoverLetterText(e.target.value)}
-              rows={12}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl mb-4"
+              rows={10}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl mb-6"
             />
+
+            <h2 className="text-lg font-semibold mb-2">Preview</h2>
             <div
               ref={previewRef}
               className="bg-white text-black border border-gray-300 rounded-xl p-6 whitespace-pre-wrap font-serif leading-relaxed mb-6"
+              style={{ minHeight: "400px" }}
             >
               {coverLetterText}
             </div>
+
             <button
               onClick={handleDownload}
               className="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition"
