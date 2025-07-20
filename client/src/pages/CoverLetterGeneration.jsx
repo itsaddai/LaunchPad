@@ -53,27 +53,43 @@ const CoverletterGeneration = () => {
   };
 
   const handleDownload = async () => {
-    const element = previewRef.current;
-    if (!element) return;
+  if (!coverLetterText) return;
 
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
+  const element = document.createElement("div");
+  element.style.width = "8.5in";
+  element.style.minHeight = "11in";
+  element.style.padding = "1in";
+  element.style.backgroundColor = "#ffffff";
+  element.style.color = "#000000";
+  element.style.fontFamily = "Georgia, serif";
+  element.style.fontSize = "12pt";
+  element.style.lineHeight = "1.6";
+  element.style.whiteSpace = "pre-wrap";
+  element.innerText = coverLetterText;
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "pt", "letter");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  document.body.appendChild(element);
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("Cover_Letter.pdf");
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
-  };
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "pt", "letter");
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("Cover_Letter.pdf");
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+  } finally {
+    document.body.removeChild(element);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex items-start justify-center py-12 px-4">
