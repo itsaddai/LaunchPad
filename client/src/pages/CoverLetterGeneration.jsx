@@ -52,9 +52,11 @@ const CoverletterGeneration = () => {
   };
 
   const handleDownload = () => {
-    const element = previewRef.current;
-    if (!element) return;
+  const element = previewRef.current;
+  if (!element) return;
 
+  // Force layout repaint
+  setTimeout(() => {
     html2pdf()
       .set({
         margin: 1,
@@ -71,7 +73,8 @@ const CoverletterGeneration = () => {
       .catch((error) => {
         console.error("PDF download error:", error);
       });
-  };
+  }, 200); // Delay ensures content is visible/rendered
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 flex items-start justify-center py-12 px-4">
